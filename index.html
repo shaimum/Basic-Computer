@@ -1,0 +1,823 @@
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  .app {
+    font-family: 'Hind Siliguri', 'Noto Sans Bengali', sans-serif;
+    background: linear-gradient(135deg, #1a0533 0%, #0d1b4a 50%, #0a2e1a 100%);
+    min-height: 100vh;
+    padding: 0;
+    color: #fff;
+  }
+
+  .hero {
+    background: linear-gradient(135deg, #6c11c7 0%, #1e40af 50%, #065f46 100%);
+    padding: 2rem 1.5rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+    animation: pulse 4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.5; }
+    50% { transform: scale(1.1); opacity: 1; }
+  }
+
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 4px 16px;
+    font-size: 12px;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+  }
+
+  .hero h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+  }
+
+  .hero p {
+    font-size: 0.95rem;
+    opacity: 0.85;
+    max-width: 500px;
+    margin: 0 auto 1.2rem;
+    line-height: 1.6;
+  }
+
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .stat-chip {
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 12px;
+    padding: 8px 16px;
+    text-align: center;
+  }
+
+  .stat-chip .num { font-size: 1.4rem; font-weight: 700; }
+  .stat-chip .lbl { font-size: 11px; opacity: 0.75; }
+
+  .tabs-bar {
+    display: flex;
+    gap: 6px;
+    padding: 1rem 1.2rem 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tabs-bar::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 20px;
+    color: rgba(255,255,255,0.7);
+    padding: 6px 14px;
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .tab-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+  .tab-btn.active { background: #7c3aed; border-color: #9f6fff; color: #fff; }
+
+  .content-area {
+    padding: 1rem 1.2rem 2rem;
+  }
+
+  .week-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    opacity: 0.5;
+    text-transform: uppercase;
+    margin: 1rem 0 0.5rem;
+  }
+
+  .day-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: all 0.25s;
+    cursor: pointer;
+  }
+
+  .day-card:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.25); transform: translateY(-1px); }
+  .day-card.expanded { border-color: rgba(255,255,255,0.3); }
+
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .day-num {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+
+  .day-num .d-label { font-size: 9px; opacity: 0.8; }
+  .day-num .d-val { font-size: 18px; line-height: 1; }
+
+  .day-info { flex: 1; min-width: 0; }
+  .day-title { font-size: 15px; font-weight: 600; line-height: 1.3; }
+  .day-sub { font-size: 12px; opacity: 0.65; margin-top: 2px; }
+
+  .day-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  .time-chip { font-size: 11px; background: rgba(255,255,255,0.1); border-radius: 8px; padding: 3px 8px; }
+  .chevron { font-size: 18px; opacity: 0.5; transition: transform 0.2s; }
+  .day-card.expanded .chevron { transform: rotate(90deg); }
+
+  .day-body {
+    display: none;
+    padding: 0 16px 16px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    margin-top: 0;
+    padding-top: 14px;
+  }
+
+  .day-card.expanded .day-body { display: block; }
+
+  .topics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  .topic-item {
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 8px 10px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    line-height: 1.4;
+  }
+
+  .topic-dot { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .task-box {
+    background: rgba(250,204,21,0.1);
+    border: 1px solid rgba(250,204,21,0.3);
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 10px;
+  }
+
+  .task-title { font-size: 12px; font-weight: 600; color: #fbbf24; margin-bottom: 6px; letter-spacing: 0.5px; }
+  .task-text { font-size: 13px; line-height: 1.6; opacity: 0.9; }
+
+  .progress-section {
+    padding: 1rem 1.2rem;
+    background: rgba(0,0,0,0.2);
+    margin: 0 0 0.5rem;
+  }
+
+  .progress-title { font-size: 13px; font-weight: 600; opacity: 0.7; margin-bottom: 10px; }
+
+  .progress-bar-wrap {
+    background: rgba(255,255,255,0.1);
+    border-radius: 20px;
+    height: 8px;
+    overflow: hidden;
+    margin-bottom: 6px;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 20px;
+    background: linear-gradient(90deg, #7c3aed, #06b6d4);
+    transition: width 0.6s ease;
+  }
+
+  .progress-labels { display: flex; justify-content: space-between; font-size: 11px; opacity: 0.55; }
+
+  .week1-color { background: linear-gradient(135deg, #7c3aed, #9f6fff); }
+  .week2-color { background: linear-gradient(135deg, #0ea5e9, #38bdf8); }
+  .week3-color { background: linear-gradient(135deg, #10b981, #34d399); }
+
+  .filter-row { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; }
+  .filter-chip {
+    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: transparent;
+    color: rgba(255,255,255,0.65);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  .filter-chip:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .filter-chip.on { background: rgba(255,255,255,0.15); color: #fff; border-color: rgba(255,255,255,0.4); }
+
+  .overview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ov-card {
+    border-radius: 14px;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .ov-icon { font-size: 28px; margin-bottom: 6px; }
+  .ov-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .ov-desc { font-size: 12px; opacity: 0.7; line-height: 1.5; }
+
+  .cert-section {
+    background: linear-gradient(135deg, rgba(124,58,237,0.3), rgba(6,182,212,0.3));
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  .cert-icon { font-size: 40px; margin-bottom: 8px; }
+  .cert-title { font-size: 16px; font-weight: 700; margin-bottom: 6px; }
+  .cert-desc { font-size: 13px; opacity: 0.75; line-height: 1.6; }
+
+  .hidden { display: none !important; }
+</style>
+
+<div class="app">
+  <div class="hero">
+    <div class="hero-badge">🇧🇩 বাংলাদেশি শিক্ষার্থীদের জন্য</div>
+    <h1>💻 কম্পিউটার বেসিক কোর্স</h1>
+    <p>শূন্য থেকে দক্ষতা অর্জন করুন — মাত্র ১৫ দিনে কম্পিউটার সম্পূর্ণ শিখুন</p>
+    <div class="stats-row">
+      <div class="stat-chip"><div class="num">১৫</div><div class="lbl">দিন</div></div>
+      <div class="stat-chip"><div class="num">৪৫+</div><div class="lbl">টপিক</div></div>
+      <div class="stat-chip"><div class="num">১৫</div><div class="lbl">প্র্যাকটিস টাস্ক</div></div>
+      <div class="stat-chip"><div class="num">৩</div><div class="lbl">সপ্তাহ</div></div>
+    </div>
+  </div>
+
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="showTab('schedule')">📅 সময়সূচি</button>
+    <button class="tab-btn" onclick="showTab('overview')">📊 সংক্ষিপ্ত</button>
+    <button class="tab-btn" onclick="showTab('progress')">✅ অগ্রগতি</button>
+    <button class="tab-btn" onclick="showTab('tips')">💡 টিপস</button>
+  </div>
+
+  <div id="tab-schedule" class="content-area">
+    <div class="filter-row">
+      <button class="filter-chip on" onclick="filterWeek('all', this)">সব দিন</button>
+      <button class="filter-chip" onclick="filterWeek('week1', this)">সপ্তাহ ১</button>
+      <button class="filter-chip" onclick="filterWeek('week2', this)">সপ্তাহ ২</button>
+      <button class="filter-chip" onclick="filterWeek('week3', this)">সপ্তাহ ৩</button>
+    </div>
+
+    <div class="week-label" data-week="week1">📘 সপ্তাহ ১ — পরিচিতি ও মৌলিক ধারণা</div>
+
+    <div class="day-card" data-week="week1" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week1-color"><div class="d-label">দিন</div><div class="d-val">১</div></div>
+        <div class="day-info">
+          <div class="day-title">কম্পিউটার পরিচিতি</div>
+          <div class="day-sub">কম্পিউটার কী, ইতিহাস ও প্রকারভেদ</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ২ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">🖥️</span>কম্পিউটার কী ও কেন দরকার</div>
+          <div class="topic-item"><span class="topic-dot">📜</span>কম্পিউটারের সংক্ষিপ্ত ইতিহাস</div>
+          <div class="topic-item"><span class="topic-dot">🗂️</span>ডেস্কটপ, ল্যাপটপ, ট্যাবলেট পার্থক্য</div>
+          <div class="topic-item"><span class="topic-dot">🔌</span>হার্ডওয়্যার ও সফটওয়্যার ধারণা</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">নোটবুকে কম্পিউটারের ৫টি ব্যবহার লিখুন যা আপনার দৈনন্দিন জীবনে কাজে লাগবে। পরিবারের কাউকে কম্পিউটার সম্পর্কে বোঝান।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week1" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week1-color"><div class="d-label">দিন</div><div class="d-val">২</div></div>
+        <div class="day-info">
+          <div class="day-title">হার্ডওয়্যার পরিচিতি</div>
+          <div class="day-sub">কীবোর্ড, মাউস, মনিটর, CPU</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ২ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">⌨️</span>কীবোর্ডের বোতাম ও ফাংশন</div>
+          <div class="topic-item"><span class="topic-dot">🖱️</span>মাউস ব্যবহার — ক্লিক, ডাবল ক্লিক, ড্র্যাগ</div>
+          <div class="topic-item"><span class="topic-dot">🖥️</span>মনিটর ও রেজুলিউশন</div>
+          <div class="topic-item"><span class="topic-dot">💾</span>RAM, ROM ও স্টোরেজ বোঝা</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">কম্পিউটার চালু করুন, মাউস দিয়ে ডেস্কটপ আইকনে ডাবল ক্লিক করুন এবং কীবোর্ডের সব বিশেষ বোতাম (Ctrl, Alt, Shift, Enter) চিনুন।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week1" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week1-color"><div class="d-label">দিন</div><div class="d-val">৩</div></div>
+        <div class="day-info">
+          <div class="day-title">উইন্ডোজ অপারেটিং সিস্টেম</div>
+          <div class="day-sub">ডেস্কটপ, টাস্কবার, স্টার্ট মেনু</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ২.৫ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">🪟</span>উইন্ডোজ ডেস্কটপ চেনা</div>
+          <div class="topic-item"><span class="topic-dot">📂</span>ফাইল এক্সপ্লোরার খোলা</div>
+          <div class="topic-item"><span class="topic-dot">⚙️</span>কন্ট্রোল প্যানেল ও সেটিংস</div>
+          <div class="topic-item"><span class="topic-dot">🔍</span>কম্পিউটারে কিছু খোঁজার পদ্ধতি</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">স্টার্ট মেনু থেকে ক্যালকুলেটর, নোটপ্যাড ও পেইন্ট খুলুন। ডেস্কটপে একটি নতুন ফোল্ডার তৈরি করুন এবং নাম দিন "আমার প্র্যাকটিস"।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week1" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week1-color"><div class="d-label">দিন</div><div class="d-val">৪</div></div>
+        <div class="day-info">
+          <div class="day-title">ফাইল ও ফোল্ডার ব্যবস্থাপনা</div>
+          <div class="day-sub">তৈরি, কপি, মুভ, ডিলিট</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ২ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">📁</span>ফোল্ডার তৈরি ও নামকরণ</div>
+          <div class="topic-item"><span class="topic-dot">📋</span>Copy, Cut, Paste (Ctrl+C, X, V)</div>
+          <div class="topic-item"><span class="topic-dot">🗑️</span>রিসাইকেল বিন ব্যবহার</div>
+          <div class="topic-item"><span class="topic-dot">🔄</span>ফাইল রিনেম ও প্রপার্টিজ</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">৩টি আলাদা ফোল্ডার বানান (ছবি, ডকুমেন্ট, অন্যান্য)। একটি নোটপ্যাড ফাইল তৈরি করে সেটি কপি করে ডকুমেন্ট ফোল্ডারে রাখুন।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week1" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week1-color"><div class="d-label">দিন</div><div class="d-val">৫</div></div>
+        <div class="day-info">
+          <div class="day-title">বাংলা ও ইংরেজি টাইপিং</div>
+          <div class="day-sub">কীবোর্ড শর্টকাট ও টাইপিং দক্ষতা</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ৩ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">🔤</span>ইংরেজি টাইপিং প্র্যাকটিস</div>
+          <div class="topic-item"><span class="topic-dot">বা</span>বাংলা Avro কীবোর্ড সেটআপ</div>
+          <div class="topic-item"><span class="topic-dot">⚡</span>গুরুত্বপূর্ণ শর্টকাট কী</div>
+          <div class="topic-item"><span class="topic-dot">🎯</span>সঠিক হাতের অবস্থান (Home Row)</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">নোটপ্যাডে ইংরেজিতে নিজের পরিচয় টাইপ করুন (১০ লাইন)। Avro দিয়ে বাংলায় ৫টি বাক্য লিখুন। টার্গেট: মিনিটে কমপক্ষে ১৫ শব্দ।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="week-label" data-week="week2">📗 সপ্তাহ ২ — অফিস সফটওয়্যার ও ইন্টারনেট</div>
+
+    <div class="day-card" data-week="week2" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week2-color"><div class="d-label">দিন</div><div class="d-val">৬</div></div>
+        <div class="day-info">
+          <div class="day-title">MS Word — মৌলিক ব্যবহার</div>
+          <div class="day-sub">ডকুমেন্ট তৈরি, ফরম্যাটিং, সেভ</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ৩ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">📄</span>নতুন ডকুমেন্ট খোলা ও সেভ করা</div>
+          <div class="topic-item"><span class="topic-dot">✏️</span>ফন্ট, সাইজ, Bold, Italic, Underline</div>
+          <div class="topic-item"><span class="topic-dot">📐</span>পেজ মার্জিন ও লেআউট</div>
+          <div class="topic-item"><span class="topic-dot">🖨️</span>প্রিন্ট প্রিভিউ ও প্রিন্ট করা</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">MS Word-এ নিজের একটি জীবন পরিচিতি (CV/বায়োডাটার মতো) তৈরি করুন। নাম হেডিং ফরম্যাট করুন, ঠিকানা, শিক্ষা লিখুন এবং .docx হিসেবে সেভ করুন।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week2" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week2-color"><div class="d-label">দিন</div><div class="d-val">৭</div></div>
+        <div class="day-info">
+          <div class="day-title">MS Excel — ডেটা ও হিসাব</div>
+          <div class="day-sub">স্প্রেডশিট, ফর্মুলা, চার্ট</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ৩ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">📊</span>সেল, রো, কলাম বোঝা</div>
+          <div class="topic-item"><span class="topic-dot">➕</span>SUM, AVERAGE, MAX ফর্মুলা</div>
+          <div class="topic-item"><span class="topic-dot">📈</span>সাধারণ বার ও পাই চার্ট</div>
+          <div class="topic-item"><span class="topic-dot">🔢</span>সংখ্যা ফরম্যাটিং</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">পরিবারের মাসিক আয়-ব্যয়ের একটি তালিকা Excel-এ তৈরি করুন। SUM দিয়ে মোট হিসাব করুন এবং একটি বার চার্ট যোগ করুন।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week2" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week2-color"><div class="d-label">দিন</div><div class="d-val">৮</div></div>
+        <div class="day-info">
+          <div class="day-title">ইন্টারনেট পরিচিতি</div>
+          <div class="day-sub">ব্রাউজার, সার্চ, ওয়েবসাইট</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ২ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">🌐</span>ইন্টারনেট কীভাবে কাজ করে</div>
+          <div class="topic-item"><span class="topic-dot">🔍</span>Google-এ সঠিকভাবে সার্চ করা</div>
+          <div class="topic-item"><span class="topic-dot">🔗</span>URL, HTTP, HTTPS বোঝা</div>
+          <div class="topic-item"><span class="topic-dot">🔖</span>বুকমার্ক ও ব্রাউজার হিস্ট্রি</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">Google-এ "বাংলাদেশের জাতীয় দিবস" সার্চ করুন এবং ৩টি ওয়েবসাইট থেকে তথ্য পড়ুন। bdnews24.com ও prothomalo.com ভিজিট করুন।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week2" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week2-color"><div class="d-label">দিন</div><div class="d-val">৯</div></div>
+        <div class="day-info">
+          <div class="day-title">ইমেইল ও যোগাযোগ</div>
+          <div class="day-sub">Gmail, ইমেইল পাঠানো ও পাওয়া</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ২.৫ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">📧</span>Gmail অ্যাকাউন্ট খোলা</div>
+          <div class="topic-item"><span class="topic-dot">✉️</span>ইমেইল লেখা ও পাঠানো</div>
+          <div class="topic-item"><span class="topic-dot">📎</span>ফাইল অ্যাটাচমেন্ট যোগ করা</div>
+          <div class="topic-item"><span class="topic-dot">📥</span>ইনবক্স, সেন্ট, স্প্যাম ম্যানেজ</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">নিজের Gmail অ্যাকাউন্ট থেকে শিক্ষক বা বন্ধুকে একটি আনুষ্ঠানিক ইমেইল পাঠান। সাথে গতকালের Word ফাইলটি অ্যাটাচ করুন।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week2" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week2-color"><div class="d-label">দিন</div><div class="d-val">১০</div></div>
+        <div class="day-info">
+          <div class="day-title">ইন্টারনেট নিরাপত্তা</div>
+          <div class="day-sub">পাসওয়ার্ড, স্ক্যাম, ডেটা সুরক্ষা</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ২ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">🔒</span>শক্তিশালী পাসওয়ার্ড তৈরি</div>
+          <div class="topic-item"><span class="topic-dot">⚠️</span>ফিশিং ও অনলাইন স্ক্যাম চেনা</div>
+          <div class="topic-item"><span class="topic-dot">🛡️</span>অ্যান্টিভাইরাস ও ফায়ারওয়াল</div>
+          <div class="topic-item"><span class="topic-dot">🚫</span>অপরিচিত লিঙ্কে ক্লিক না করা</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">Gmail ও Facebook-এর পাসওয়ার্ড শক্তিশালী করুন (বড়-ছোট হাতা অক্ষর + সংখ্যা + চিহ্ন)। Two-Factor Authentication চালু করুন।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="week-label" data-week="week3">📕 সপ্তাহ ৩ — উন্নত দক্ষতা ও প্রায়োগিক কাজ</div>
+
+    <div class="day-card" data-week="week3" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week3-color"><div class="d-label">দিন</div><div class="d-val">১১</div></div>
+        <div class="day-info">
+          <div class="day-title">Google Drive ও ক্লাউড</div>
+          <div class="day-sub">ফাইল সংরক্ষণ ও শেয়ারিং</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ২ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">☁️</span>Google Drive-এ ফাইল আপলোড</div>
+          <div class="topic-item"><span class="topic-dot">🤝</span>ফোল্ডার শেয়ার করা</div>
+          <div class="topic-item"><span class="topic-dot">📱</span>মোবাইল থেকে একসেস</div>
+          <div class="topic-item"><span class="topic-dot">🔗</span>শেয়ারযোগ্য লিঙ্ক তৈরি</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">Google Drive-এ "কোর্স ফাইল" নামে একটি ফোল্ডার বানান। এতদিনের সব প্র্যাকটিস ফাইল আপলোড করুন এবং শিক্ষকের সাথে শেয়ার করুন।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week3" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week3-color"><div class="d-label">দিন</div><div class="d-val">১২</div></div>
+        <div class="day-info">
+          <div class="day-title">MS PowerPoint</div>
+          <div class="day-sub">প্রেজেন্টেশন তৈরি ও ডিজাইন</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ৩ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">🎨</span>স্লাইড তৈরি ও থিম নির্বাচন</div>
+          <div class="topic-item"><span class="topic-dot">🖼️</span>ছবি ও চার্ট যোগ করা</div>
+          <div class="topic-item"><span class="topic-dot">🎬</span>স্লাইড ট্রানজিশন অ্যানিমেশন</div>
+          <div class="topic-item"><span class="topic-dot">📽️</span>প্রেজেন্টেশন মোডে দেখানো</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">"আমার স্বপ্নের পেশা" বিষয়ে ৫টি স্লাইডের একটি প্রেজেন্টেশন তৈরি করুন। প্রতিটি স্লাইডে ছবি ও বুলেট পয়েন্ট ব্যবহার করুন।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week3" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week3-color"><div class="d-label">দিন</div><div class="d-val">১৩</div></div>
+        <div class="day-info">
+          <div class="day-title">ডিজিটাল সেবা ব্যবহার</div>
+          <div class="day-sub">বাংলাদেশি অনলাইন সেবাসমূহ</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ২.৫ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">🏛️</span>e-সরকার সেবা পোর্টাল</div>
+          <div class="topic-item"><span class="topic-dot">💳</span>মোবাইল ব্যাংকিং (bKash, Nagad)</div>
+          <div class="topic-item"><span class="topic-dot">🎓</span>শিক্ষা সংক্রান্ত অনলাইন রিসোর্স</div>
+          <div class="topic-item"><span class="topic-dot">🛒</span>অনলাইন শপিং (Daraz, Shajgoj)</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">সরকারি ওয়েবসাইট (forms.gov.bd বা eksheba.gov.bd) ভিজিট করুন। YouTube-এ বাংলায় একটি শিক্ষামূলক ভিডিও খুঁজে নোট নিন।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week3" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week3-color"><div class="d-label">দিন</div><div class="d-val">১৪</div></div>
+        <div class="day-info">
+          <div class="day-title">কম্পিউটার রক্ষণাবেক্ষণ</div>
+          <div class="day-sub">আপডেট, ভাইরাস, পারফরম্যান্স</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ২ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">🔄</span>Windows Update চালানো</div>
+          <div class="topic-item"><span class="topic-dot">🧹</span>ডিস্ক ক্লিনআপ ও অপ্রয়োজনীয় ফাইল মুছা</div>
+          <div class="topic-item"><span class="topic-dot">🛡️</span>Windows Defender স্ক্যান</div>
+          <div class="topic-item"><span class="topic-dot">⚡</span>Startup প্রোগ্রাম ম্যানেজ</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 দিনের কাজ</div>
+          <div class="task-text">Windows Defender দিয়ে পূর্ণ স্ক্যান করুন। Disk Cleanup চালান। Task Manager-এ দেখুন কোন প্রোগ্রাম বেশি RAM ব্যবহার করছে।</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="day-card" data-week="week3" onclick="toggle(this)">
+      <div class="day-header">
+        <div class="day-num week3-color" style="background: linear-gradient(135deg, #f59e0b, #ef4444);"><div class="d-label">দিন</div><div class="d-val">১৫</div></div>
+        <div class="day-info">
+          <div class="day-title">🏆 চূড়ান্ত পরীক্ষা ও উৎসব</div>
+          <div class="day-sub">সব কিছু একত্রে করে দেখান!</div>
+        </div>
+        <div class="day-meta"><div class="time-chip">⏱ ৪ ঘণ্টা</div><div class="chevron">›</div></div>
+      </div>
+      <div class="day-body">
+        <div class="topics-grid">
+          <div class="topic-item"><span class="topic-dot">📝</span>লিখিত প্রশ্নোত্তর পরীক্ষা</div>
+          <div class="topic-item"><span class="topic-dot">💻</span>প্র্যাকটিক্যাল কম্পিউটার পরীক্ষা</div>
+          <div class="topic-item"><span class="topic-dot">🎤</span>নিজের প্রেজেন্টেশন উপস্থাপন</div>
+          <div class="topic-item"><span class="topic-dot">🏅</span>সার্টিফিকেট বিতরণ ও উৎসব</div>
+        </div>
+        <div class="task-box">
+          <div class="task-title">📝 চূড়ান্ত প্রকল্প</div>
+          <div class="task-text">Word-এ নিজের পূর্ণ CV তৈরি, Excel-এ বাজেট শিট বানানো, PowerPoint-এ "আমি যা শিখলাম" বিষয়ক প্রেজেন্টেশন তৈরি করে উপস্থাপন করুন।</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-overview" class="content-area hidden">
+    <div class="overview-grid">
+      <div class="ov-card" style="background: rgba(124,58,237,0.15); border-color: rgba(124,58,237,0.3);">
+        <div class="ov-icon">📘</div>
+        <div class="ov-title">সপ্তাহ ১</div>
+        <div class="ov-desc">কম্পিউটার পরিচিতি, হার্ডওয়্যার, উইন্ডোজ, ফাইল ব্যবস্থাপনা ও টাইপিং</div>
+      </div>
+      <div class="ov-card" style="background: rgba(14,165,233,0.15); border-color: rgba(14,165,233,0.3);">
+        <div class="ov-icon">📗</div>
+        <div class="ov-title">সপ্তাহ ২</div>
+        <div class="ov-desc">MS Word, Excel, ইন্টারনেট, Gmail ও অনলাইন নিরাপত্তা</div>
+      </div>
+      <div class="ov-card" style="background: rgba(16,185,129,0.15); border-color: rgba(16,185,129,0.3);">
+        <div class="ov-icon">📕</div>
+        <div class="ov-title">সপ্তাহ ৩</div>
+        <div class="ov-desc">Google Drive, PowerPoint, ডিজিটাল সেবা ও কম্পিউটার রক্ষণাবেক্ষণ</div>
+      </div>
+      <div class="ov-card" style="background: rgba(245,158,11,0.15); border-color: rgba(245,158,11,0.3);">
+        <div class="ov-icon">🏆</div>
+        <div class="ov-title">চূড়ান্ত লক্ষ্য</div>
+        <div class="ov-desc">স্বাধীনভাবে কম্পিউটার চালানো, অফিস কাজ করা ও ইন্টারনেট ব্যবহার করতে পারা</div>
+      </div>
+    </div>
+
+    <div class="cert-section" style="margin-top: 16px;">
+      <div class="cert-icon">🎓</div>
+      <div class="cert-title">কোর্স সম্পন্ন করলে পাবেন</div>
+      <div class="cert-desc">
+        কম্পিউটার বেসিক সার্টিফিকেট • MS Office দক্ষতা<br>
+        ইন্টারনেট ব্যবহারের সক্ষমতা • ডিজিটাল বাংলাদেশের অংশ হওয়ার যোগ্যতা
+      </div>
+    </div>
+
+    <div style="margin-top: 14px; padding: 14px; background: rgba(255,255,255,0.05); border-radius: 14px; border: 1px solid rgba(255,255,255,0.1);">
+      <div style="font-size: 14px; font-weight: 600; margin-bottom: 10px; color: #fbbf24;">📋 যা যা লাগবে</div>
+      <div style="font-size: 13px; line-height: 2; opacity: 0.85;">
+        ✅ একটি কম্পিউটার বা ল্যাপটপ<br>
+        ✅ ইন্টারনেট সংযোগ<br>
+        ✅ MS Office (Word, Excel, PowerPoint)<br>
+        ✅ Avro Keyboard (বিনামূল্যে ডাউনলোড)<br>
+        ✅ নোটবুক ও কলম<br>
+        ✅ প্রতিদিন ২-৩ ঘণ্টার সময়
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-progress" class="content-area hidden">
+    <div style="font-size: 15px; font-weight: 600; margin-bottom: 14px;">আপনার অগ্রগতি ট্র্যাক করুন</div>
+
+    <div id="progress-days"></div>
+
+    <div style="margin-top: 16px; padding: 14px; background: rgba(255,255,255,0.05); border-radius: 14px;">
+      <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">মোট অগ্রগতি</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" id="total-bar" style="width: 0%"></div></div>
+      <div class="progress-labels"><span id="done-count">০ দিন সম্পন্ন</span><span>মোট ১৫ দিন</span></div>
+    </div>
+  </div>
+
+  <div id="tab-tips" class="content-area hidden">
+    <div style="display: flex; flex-direction: column; gap: 10px;">
+      <div style="background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.3); border-radius: 14px; padding: 14px;">
+        <div style="font-size: 16px; margin-bottom: 6px;">🕐 সময় ব্যবস্থাপনা</div>
+        <div style="font-size: 13px; opacity: 0.85; line-height: 1.7;">প্রতিদিন একই সময়ে পড়ুন। সকালে ১ ঘণ্টা থিওরি, বিকেলে ১-২ ঘণ্টা প্র্যাকটিস করুন। ছুটির দিনে আগের দিনের রিভিশন করুন।</div>
+      </div>
+      <div style="background: rgba(14,165,233,0.15); border: 1px solid rgba(14,165,233,0.3); border-radius: 14px; padding: 14px;">
+        <div style="font-size: 16px; margin-bottom: 6px;">📓 নোট নেওয়ার অভ্যাস</div>
+        <div style="font-size: 13px; opacity: 0.85; line-height: 1.7;">প্রতিটি শর্টকাট কী নোটবুকে লিখে রাখুন। ভুল হলে ভয় পাবেন না — ভুল থেকেই শেখা হয়। প্রতিদিনের কাজের ছবি তুলে রাখুন।</div>
+      </div>
+      <div style="background: rgba(16,185,129,0.15); border: 1px solid rgba(16,185,129,0.3); border-radius: 14px; padding: 14px;">
+        <div style="font-size: 16px; margin-bottom: 6px;">🤝 সাহায্য নিন</div>
+        <div style="font-size: 13px; opacity: 0.85; line-height: 1.7;">বুঝতে না পারলে YouTube-এ বাংলায় টিউটোরিয়াল দেখুন। বন্ধু বা পরিচিতজনের সাহায্য নিন। "10 Minute School" এবং "Shikho" ব্যবহার করতে পারেন।</div>
+      </div>
+      <div style="background: rgba(245,158,11,0.15); border: 1px solid rgba(245,158,11,0.3); border-radius: 14px; padding: 14px;">
+        <div style="font-size: 16px; margin-bottom: 6px;">🎯 গুরুত্বপূর্ণ শর্টকাট</div>
+        <div style="font-size: 13px; opacity: 0.85; line-height: 1.7;">
+          Ctrl+C = কপি &nbsp;|&nbsp; Ctrl+V = পেস্ট<br>
+          Ctrl+Z = আনডু &nbsp;|&nbsp; Ctrl+S = সেভ<br>
+          Alt+Tab = উইন্ডো সুইচ<br>
+          Win+D = ডেস্কটপ দেখানো<br>
+          F5 = রিফ্রেশ
+        </div>
+      </div>
+      <div style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); border-radius: 14px; padding: 14px;">
+        <div style="font-size: 16px; margin-bottom: 6px;">⚠️ যা করবেন না</div>
+        <div style="font-size: 13px; opacity: 0.85; line-height: 1.7;">অজানা ইমেইলের লিঙ্কে ক্লিক করবেন না। পাইরেটেড সফটওয়্যার ব্যবহার করবেন না। একদিন মিস হলে হতাশ হবেন না — পরের দিন দ্বিগুণ উৎসাহে শুরু করুন।</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const dayData = [
+  {day:1,title:"কম্পিউটার পরিচিতি",week:"সপ্তাহ ১"},
+  {day:2,title:"হার্ডওয়্যার পরিচিতি",week:"সপ্তাহ ১"},
+  {day:3,title:"উইন্ডোজ অপারেটিং সিস্টেম",week:"সপ্তাহ ১"},
+  {day:4,title:"ফাইল ও ফোল্ডার",week:"সপ্তাহ ১"},
+  {day:5,title:"বাংলা ও ইংরেজি টাইপিং",week:"সপ্তাহ ১"},
+  {day:6,title:"MS Word",week:"সপ্তাহ ২"},
+  {day:7,title:"MS Excel",week:"সপ্তাহ ২"},
+  {day:8,title:"ইন্টারনেট পরিচিতি",week:"সপ্তাহ ২"},
+  {day:9,title:"ইমেইল ও যোগাযোগ",week:"সপ্তাহ ২"},
+  {day:10,title:"ইন্টারনেট নিরাপত্তা",week:"সপ্তাহ ২"},
+  {day:11,title:"Google Drive",week:"সপ্তাহ ৩"},
+  {day:12,title:"MS PowerPoint",week:"সপ্তাহ ৩"},
+  {day:13,title:"ডিজিটাল সেবা",week:"সপ্তাহ ৩"},
+  {day:14,title:"রক্ষণাবেক্ষণ",week:"সপ্তাহ ৩"},
+  {day:15,title:"চূড়ান্ত পরীক্ষা 🏆",week:"সপ্তাহ ৩"}
+];
+
+const completed = new Set(JSON.parse(localStorage&&localStorage.getItem&&localStorage.getItem('bd_course_done')||'[]'));
+
+function buildProgress() {
+  const container = document.getElementById('progress-days');
+  container.innerHTML = '';
+  dayData.forEach(d => {
+    const done = completed.has(d.day);
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 12px;background:rgba(255,255,255,0.05);border-radius:12px;margin-bottom:8px;cursor:pointer;border:1px solid rgba(255,255,255,' + (done ? '0.2' : '0.08') + ')';
+    div.innerHTML = '<div style="width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;background:' + (done ? 'rgba(16,185,129,0.4)' : 'rgba(255,255,255,0.08)') + '">' + (done ? '✓' : d.day) + '</div><div style="flex:1"><div style="font-size:14px;font-weight:500;' + (done ? 'text-decoration:line-through;opacity:0.5' : '') + '">' + d.title + '</div><div style="font-size:11px;opacity:0.5">' + d.week + '</div></div><div style="font-size:12px;background:rgba(255,255,255,0.1);padding:4px 10px;border-radius:8px">' + (done ? '✅ শেষ' : 'বাকি') + '</div>';
+    div.onclick = () => {
+      if (completed.has(d.day)) completed.delete(d.day);
+      else completed.add(d.day);
+      try { localStorage.setItem('bd_course_done', JSON.stringify([...completed])); } catch(e){}
+      updateProgress();
+      buildProgress();
+    };
+    container.appendChild(div);
+  });
+  updateProgress();
+}
+
+function updateProgress() {
+  const pct = Math.round((completed.size / 15) * 100);
+  const bar = document.getElementById('total-bar');
+  const cnt = document.getElementById('done-count');
+  if (bar) bar.style.width = pct + '%';
+  if (cnt) cnt.textContent = completed.size + ' দিন সম্পন্ন';
+}
+
+function showTab(name) {
+  ['schedule','overview','progress','tips'].forEach(t => {
+    const el = document.getElementById('tab-' + t);
+    if (el) el.classList.toggle('hidden', t !== name);
+  });
+  document.querySelectorAll('.tab-btn').forEach((b,i) => {
+    b.classList.toggle('active', ['schedule','overview','progress','tips'][i] === name);
+  });
+  if (name === 'progress') buildProgress();
+}
+
+function toggle(card) {
+  card.classList.toggle('expanded');
+}
+
+function filterWeek(week, btn) {
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.day-card').forEach(c => {
+    c.style.display = (week === 'all' || c.dataset.week === week) ? 'block' : 'none';
+  });
+  document.querySelectorAll('.week-label').forEach(l => {
+    l.style.display = (week === 'all' || l.dataset.week === week) ? 'block' : 'none';
+  });
+}
+
+buildProgress();
+</script>
